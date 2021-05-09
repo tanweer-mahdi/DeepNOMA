@@ -24,11 +24,12 @@ def gensample(N, M, J, phi, noisevar):
         C = np.hstack((C, np.diag(phi[:, i])))
 
     # creating channel vector. Channel is changing over subcarriers but not over timeslot
-    cv = np.random.normal(0, 1, (M * au, 1))
-    t= cv
-    for i in range(J-1):
-        cv = np.hstack((cv,t))
+    # cv = np.random.normal(0, 1, (M * au, 1))
+    # t= cv
+    # for i in range(J-1):
+    #     cv = np.hstack((cv,t))
 
+    cv = np.random.normal(0, 1, (M*au, J))
 
     y = np.dot(C, cv)
     y += np.random.normal(0, noisevar, (M, J))
