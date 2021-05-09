@@ -87,5 +87,11 @@ for i in dev_dataloader:
     data, labels = i
     ypred = model(data)
     print(ypred, labels)
+    for j, val in enumerate(labels):
+        a = val.numpy()
+        ind = np.where(a==1)
+        temp = ypred[j, ind]
+        print(ind)
+        print(temp)
     pdb.set_trace()
 
