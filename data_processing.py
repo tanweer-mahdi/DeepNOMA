@@ -4,9 +4,17 @@ import pdb
 # create a dummy system model
 N = 60;  # number of UE
 M = 40;  # number of subcarrier
-phi = np.random.normal(0, 1, (M, N))
-vecnorm = 1 / np.linalg.norm(phi, 2, axis=0)
-phi = np.dot(phi, np.diag(vecnorm))  # normalizing each sequence to unit norm vectors
+# phi = np.random.normal(0, 1, (M, N))
+# vecnorm = 1 / np.linalg.norm(phi, 2, axis=0)
+# phi = np.dot(phi, np.diag(vecnorm))  # normalizing each sequence to unit norm vectors
+# creating sparse codes
+phi = np.zeros((M,N))
+nz_entries = 10 # number of non-zero entries
+for i in range(phi.shape[1]):
+    nz_index = np.random.choice(np.arange(M), size = nz_entries, replace = False)
+    phi[nz_index, i] = np.random.normal(0, 1, (nz_entries,))
+
+
 noisevar = 1e-11
 J = 7
 pa = 0.05

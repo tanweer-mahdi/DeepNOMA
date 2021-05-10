@@ -5,14 +5,15 @@ from torch.utils.data import Dataset, DataLoader
 import pdb
 import torch.nn.functional as F
 # define the network structure in a dictionary
+# define the network structure in a dictionary
 structure = {
-    'input_layer' : [120 , 100],
-    'hidden_1' : [100, 100],
-    'hidden_2' : [100, 100],
-    'hidden_3' : [100, 100],
-    'hidden_4' : [100, 100],
-    'hidden_5' : [100, 100],
-    'output_layer': [100, 60],
+    'input_layer' : [280 , 250],
+    'hidden_1' : [250, 250],
+    'hidden_2' : [250, 250],
+    'hidden_3' : [250, 250],
+    'hidden_4' : [250, 250],
+    'hidden_5' : [250, 250],
+    'output_layer': [250, 60],
 }
 
 
