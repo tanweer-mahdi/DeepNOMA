@@ -2,22 +2,31 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 import pdb
 # create a dummy system model
-N = 60;  # number of UE
-M = 40;  # number of subcarrier
-# phi = np.random.normal(0, 1, (M, N))
-# vecnorm = 1 / np.linalg.norm(phi, 2, axis=0)
-# phi = np.dot(phi, np.diag(vecnorm))  # normalizing each sequence to unit norm vectors
-# creating sparse codes
-phi = np.zeros((M,N))
-nz_entries = 10 # number of non-zero entries
-for i in range(phi.shape[1]):
-    nz_index = np.random.choice(np.arange(M), size = nz_entries, replace = False)
-    phi[nz_index, i] = np.random.normal(0, 1, (nz_entries,))
+N = 60  # number of UE
+M = 40  # number of subcarrier
+distances = np.random.rand(N)*0.2 # cell radius is 200 meter
+noisevar = 1e-11 # noise variance
+J = 7 # number of slots
+pa = 0.05 # activation ratio
+tp = 20 # transmit power in dBm
+codebook = 'sparse' # choice of codebook
+
+if codebook == 'sparse':
+    phi = np.zeros((M, N))
+    nz_entries = 10  # number of non-zero entries
+    for i in range(phi.shape[1]):
+        nz_index = np.random.choice(np.arange(M), size=nz_entries, replace=False)
+        phi[nz_index, i] = np.random.normal(0, 1, (nz_entries,))
+elif codebook == 'dense':
+    phi = np.random.normal(0, 1, (M, N))
+else:
+    pass
 
 
-noisevar = 1e-11
-J = 7
-pa = 0.05
+# normalizing codebook
+vecnorm = 1 / np.linalg.norm(phi, 2, axis=0)
+phi = np.dot(phi, np.diag(vecnorm))  # normalizing each sequence to unit norm vectors
+
 
 
 # Generate training samples
@@ -37,7 +46,19 @@ def gensample(N, M, J, phi, noisevar):
     # for i in range(J-1):
     #     cv = np.hstack((cv,t))
 
-    cv = np.random.normal(0, 1, (M*au, J))
+    # creating channel vectors
+    cv = np.zeros((M*au,J))
+    for slot in range(J):
+        uchannel = np.zeros((M,au))
+
+        for i,val in enumerate(uset):
+            rp = -128.1 - 36.7*np.log10(distances[val])+tp;
+            rp = np.power(10,rp/10)
+            uchannel[:, i] = np.random.normal(0, 1, (M, ))*np.sqrt(rp)
+
+        cv[:, slot] = np.ravel(uchannel)
+
+
 
     y = np.dot(C, cv)
     y += np.random.normal(0, noisevar, (M, J))
@@ -53,7 +74,7 @@ def gensample(N, M, J, phi, noisevar):
     #return np.ravel(y).astype(dtype='float32'), labels
 
 
-P = 125000  # number of samples
+P = 125  # number of samples
 dataset = np.zeros((M * J, P), dtype='float32')
 labels = np.zeros((N, P), dtype='float32')
 
