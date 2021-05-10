@@ -47,13 +47,14 @@ def gensample(N, M, J, phi, noisevar):
     #     cv = np.hstack((cv,t))
 
     # creating channel vectors
-    cv = np.zeros((M*au,J))
-    for slot in range(J):
-        uchannel = np.zeros((M,au))
+    cv = np.zeros((M*au, J))
 
-        for i,val in enumerate(uset):
+    for slot in range(J):
+        uchannel = np.zeros((M, au))
+
+        for i, val in enumerate(uset):
             rp = -128.1 - 36.7*np.log10(distances[val])+tp;
-            rp = np.power(10,rp/10)
+            rp = np.power(10, rp/10)
             uchannel[:, i] = np.random.normal(0, 1, (M, ))*np.sqrt(rp)
 
         cv[:, slot] = np.ravel(uchannel)
@@ -74,7 +75,7 @@ def gensample(N, M, J, phi, noisevar):
     #return np.ravel(y).astype(dtype='float32'), labels
 
 
-P = 125  # number of samples
+P = 156250  # number of samples
 dataset = np.zeros((M * J, P), dtype='float32')
 labels = np.zeros((N, P), dtype='float32')
 
