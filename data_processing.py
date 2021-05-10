@@ -28,7 +28,6 @@ vecnorm = 1 / np.linalg.norm(phi, 2, axis=0)
 phi = np.dot(phi, np.diag(vecnorm))  # normalizing each sequence to unit norm vectors
 
 
-
 # Generate training samples
 def gensample(N, M, J, phi, noisevar):
     au = int(np.ceil(pa * N))
@@ -75,30 +74,47 @@ def gensample(N, M, J, phi, noisevar):
     #return np.ravel(y).astype(dtype='float32'), labels
 
 
-P = 156250  # number of samples
-dataset = np.zeros((M * J, P), dtype='float32')
-labels = np.zeros((N, P), dtype='float32')
+# number of models in the ensemble
+ensemble = 5
+P = 10000  # number of samples
 
-for i in range(P):
+for i in range(ensemble):
+    dataset = np.zeros((M * J, P), dtype='float32')
+    labels = np.zeros((N, P), dtype='float32')
+
+    for j in range(P):
+        data, label = gensample(N,M,J,phi,noisevar)
+        dataset[:, j] = data
+        labels[:, j] = label
+
+
+
+    training_name = 'training_set_' + str(i) + '.npy'
+    labels_name = 'labels_' + str(i) + '.npy'
+    # ## saving training data
+    with open(training_name,'wb') as file: # using "with" while opening file is a good idea. It properly closes the file.
+        np.save(file, dataset)
+
+    ## saving training labels
+    with open(labels_name,'wb') as file:
+        np.save(file, labels)
+
+
+
+# creating dev data
+dev_sample = 40000
+
+dataset = np.zeros((M * J, dev_sample), dtype='float32')
+labels = np.zeros((N, dev_sample), dtype='float32')
+
+for i in range(dev_sample):
     data, label = gensample(N,M,J,phi,noisevar)
     dataset[:, i] = data
     labels[:, i] = label
 
-
-# Training data/ Dev data splitting
-train_data, dev_data, train_label, dev_label = train_test_split(dataset.T, labels.T, test_size= 0.20)
-
-# ## saving training data
-with open('training_set.npy','wb') as file: # using "with" while opening file is a good idea. It properly closes the file.
-    np.save(file,train_data.T)
-
-## saving training labels
-with open('labels.npy','wb') as file:
-    np.save(file,train_label.T)
-
 # saving dev data
 with open('dev_data.npy', 'wb') as file:
-    np.save(file, dev_data.T)
+    np.save(file, dataset)
 
 with open('dev_labels.npy', 'wb') as file:
-    np.save(file, dev_label.T)
+    np.save(file, labels)
