@@ -7,8 +7,8 @@ from torch.utils.data import Dataset, DataLoader
 from torch.utils.tensorboard import SummaryWriter
 from sklearn.model_selection import KFold
 # loading data
-training = 'training_set.npy'
-labels = 'labels.npy'
+training = 'training_set_0.npy'
+labels = 'labels_0.npy'
 
 # exploring data
 train_exp = np.load(training, mmap_mode= 'r')
