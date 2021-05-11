@@ -76,9 +76,9 @@ def gensample(N, M, J, phi, noisevar):
 
 # number of models in the ensemble
 ensemble = 5
-P = 10000  # number of samples
+P = 125000  # number of samples
 
-for i in range(ensemble):
+for ii in range(ensemble):
     dataset = np.zeros((M * J, P), dtype='float32')
     labels = np.zeros((N, P), dtype='float32')
 
@@ -89,8 +89,8 @@ for i in range(ensemble):
 
 
 
-    training_name = 'training_set_' + str(i) + '.npy'
-    labels_name = 'labels_' + str(i) + '.npy'
+    training_name = 'training_set_' + str(ii) + '.npy'
+    labels_name = 'labels_' + str(ii) + '.npy'
     # ## saving training data
     with open(training_name,'wb') as file: # using "with" while opening file is a good idea. It properly closes the file.
         np.save(file, dataset)
