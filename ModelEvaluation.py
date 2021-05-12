@@ -61,7 +61,7 @@ class DeepNOMA(nn.Module):
 
 # loading model
 model = DeepNOMA(structure)
-load_path = 'model.pth'
+load_path = 'model_0.pth'
 model.load_state_dict(torch.load(load_path))
 model.eval()
 
@@ -82,17 +82,19 @@ class dev_dataset(Dataset):
         return self.dev_data[:, idx], self.dev_labels[:, idx]
 
 dev_dataset = dev_dataset(dev_data, dev_label)
-dev_dataloader = DataLoader(dataset= dev_dataset, batch_size= 10)
+dev_dataloader = DataLoader(dataset= dev_dataset, batch_size= 3)
 
 for i in dev_dataloader:
     data, labels = i
     ypred = model(data)
-    print(ypred, labels)
+    print(labels)
+    print(ypred)
+    pdb.set_trace()
     for j, val in enumerate(labels):
         a = val.numpy()
         ind = np.where(a==1)
         temp = ypred[j, ind]
         print(ind)
         print(temp)
-    pdb.set_trace()
+
 
