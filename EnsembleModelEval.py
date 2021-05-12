@@ -60,7 +60,7 @@ class DeepNOMA(nn.Module):
 
 
 # creating models
-ensembles = 3
+ensembles = 4
 models = []
 for i in range(ensembles):
     models.append(DeepNOMA(structure))
