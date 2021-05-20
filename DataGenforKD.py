@@ -95,7 +95,7 @@ kdataset = KData(dataset, tlabel)
 batch = 500
 KDataloader = DataLoader(kdataset, batch_size= batch, shuffle= False)
 sigmoid = nn.Sigmoid()
-temperature = 2;
+temperature = 3;
 tensor_list = []
 mlabel = np.zeros((tlabel.shape[0], tlabel.shape[1]))
 for ind, i in enumerate(KDataloader):
@@ -105,10 +105,10 @@ for ind, i in enumerate(KDataloader):
         ypred += model(data)
 
     ypred /= ensembles
-    ypred = sigmoid(ypred/temperature)
+    # ypred = sigmoid(ypred/temperature)
     mlabel[:, ind*batch : (ind+1)*batch] = ypred.detach().numpy().T
 
-with open('mlabels.npy','wb') as file:
+with open('mlabels_logit.npy','wb') as file:
     np.save(file,mlabel)
 
 
