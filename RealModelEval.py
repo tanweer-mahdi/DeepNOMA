@@ -6,8 +6,8 @@ import pdb
 import torch.nn.functional as F
 
 # loading data
-training = 'real_training_set_0.npy'
-labels = 'real_labels_0.npy'
+training = 'real_training_set_1.npy'
+labels = 'real_labels_1.npy'
 # exploring data
 train_exp = np.load(training, mmap_mode= 'r')
 labels_exp = np.load(labels, mmap_mode = 'r')
@@ -18,7 +18,7 @@ print("Number of Training Samples:", train_exp.shape[1])
 print("Number of labels:", num_labels)
 # define the network structure in a dictionary
 il = input_features
-hl = int(input_features*0.1)
+hl = int(input_features*0.95)
 structure = {
     'input_layer' : [il , hl],
     'hidden_1' : [hl, hl],
@@ -73,7 +73,7 @@ class DeepNOMA(nn.Module):
 
 
 # creating models
-ensembles = 1
+ensembles = 2
 models = []
 for i in range(ensembles):
     models.append(DeepNOMA(structure))
@@ -85,9 +85,11 @@ for i in range(ensembles):
     models[i].load_state_dict(torch.load(load_path))
     models[i].eval()
 
+
+
 # loading dev set
-dev_data = np.load('rdev_data.npy')
-dev_label = np.load('rev_labels.npy')
+dev_data = np.load('real_dev_data.npy')
+dev_label = np.load('real_dev_labels.npy')
 
 # # create a dataset
 class dev_dataset(Dataset):
@@ -113,7 +115,7 @@ for i in dev_dataloader:
     for model in models:
         ypred += model(data)
 
-    #pdb.set_trace()
+
     ypred /= len(models) # averaging the logits
     ypred[ypred >= 0] = 1 # essentially doing sigmoids
     ypred[ypred < 0] = 0 # essentially doing sigmoids
@@ -124,6 +126,31 @@ for i in dev_dataloader:
 total_RA = dev_data.shape[1]
 aer = total_error / (total_RA*3)
 print("Total Activity Error:", aer)
+
+#################################### Independent Model Check ########################################
+# independent model check
+# indmodel = DeepNOMA(structure)
+# indmodel.load_state_dict(torch.load('rmodel_1.pth'))
+# indmodel.eval()
+# total_error = 0
+# for i in dev_dataloader:
+#     data, labels = i
+#     ypred = torch.zeros(batch, num_labels)
+#
+#     ypred = indmodel(data)
+#     pdb.set_trace()
+#     ypred /= len(models) # averaging the logits
+#     ypred[ypred >= 0] = 1 # essentially doing sigmoids
+#     ypred[ypred < 0] = 0 # essentially doing sigmoids
+#     temp = torch.abs(ypred - labels)
+#     total_error += torch.sum(temp).item()
+#
+# # calculating activity error rate
+# total_RA = dev_data.shape[1]
+# aer = total_error / (total_RA*3)
+# print("Total Activity Error:", aer)
+
+############################################################################################################
 
 
 
