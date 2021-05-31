@@ -4,7 +4,7 @@ import numpy as np
 from torch.utils.data import Dataset, DataLoader
 import pdb
 import torch.nn.functional as F
-# define the network structure in a dictionary
+
 # define the network structure in a dictionary
 structure = {
     'input_layer' : [280 , 250],
@@ -111,7 +111,31 @@ total_RA = dev_data.shape[1]
 aer = total_error / (total_RA*3)
 print("Total Activity Error:", aer)
 
+kd_model = DeepNOMA(structure)
+kd_model.load_state_dict(torch.load('kd_model.pth'))
+kd_model.eval()
 
+######## Inference using Distilled model #########
+batch = 3
+total_error = 0
+
+for i in dev_dataloader:
+    data, labels = i
+    ypred = torch.zeros(batch, 60)
+
+    for model in models:
+        ypred += kd_model(data)
+
+    ypred /= len(models) # averaging the logits
+    ypred[ypred >= 0] = 1 # essentially doing sigmoids
+    ypred[ypred < 0] = 0 # essentially doing sigmoids
+    temp = torch.abs(ypred - labels)
+    total_error += torch.sum(temp).item()
+
+# calculating activity error rate
+total_RA = dev_data.shape[1]
+aer = total_error / (total_RA*3)
+print("Total Activity Error by Distilled Model:", aer)
 
 
 
