@@ -7,8 +7,8 @@ from torch.utils.data import Dataset, DataLoader
 from torch.utils.tensorboard import SummaryWriter
 from sklearn.model_selection import KFold
 # loading data
-training = 'training_set_2.npy'
-labels = 'labels_2.npy'
+training = 'training_set_3.npy'
+labels = 'labels_3.npy'
 
 # exploring data
 train_exp = np.load(training, mmap_mode= 'r')
@@ -158,5 +158,5 @@ for fold, (train_idx, test_idx) in enumerate(cv.split(nomadata)):
 
 
 # Saving the entire model
-save_path = 'model_2.pth'
+save_path = 'model_3.pth'
 torch.save(model.state_dict(), save_path)
