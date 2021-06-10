@@ -9,8 +9,9 @@ from torch.utils.data import Dataset, DataLoader
 from torch.utils.tensorboard import SummaryWriter
 from sklearn.model_selection import KFold
 # loading data
-training = 'rtraining_set_0.npy'
-labels = 'rlabels_0.npy'
+M = 64
+training = 'training_set_' + str(M) + '_' + '0.npy'
+labels = 'labels_' + str(M) + '_' + '0.npy'
 
 # exploring data
 train_exp = np.load(training, mmap_mode= 'r')
@@ -41,7 +42,7 @@ nomadata = nomadata(training,labels)
 
 # define the network structure in a dictionary
 il = input_features
-hl = int(input_features*0.1)
+hl = int(input_features*1)
 structure = {
     'input_layer' : [il , hl],
     'hidden_1' : [hl, hl],
@@ -127,7 +128,7 @@ for fold, (train_idx, test_idx) in enumerate(cv.split(nomadata)):
 
     running_loss = 0
     if fold == 0:
-        for epoch in range(300):
+        for epoch in range(200):
             for i, val in enumerate(trainloader):
                 inputs, targets = val
                 # clear the gradients
@@ -166,5 +167,5 @@ for fold, (train_idx, test_idx) in enumerate(cv.split(nomadata)):
 
 
 # Saving the entire model
-save_path = 'rmodel_0.pth'
+save_path = 'rmodel_' + str(M) + '_0.pth'
 torch.save(model.state_dict(), save_path)
