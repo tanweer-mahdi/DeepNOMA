@@ -4,16 +4,16 @@ from sklearn.model_selection import train_test_split
 import pdb
 
 # number of models in the ensemble
-ensemble = 5
-P = 20  # number of samples
-dev_sample = 20  # number of dev samples
+ensemble = 2
+P = 500000  # number of samples
+dev_sample = 20000  # number of dev samples
 # create a dummy system model
 N = 96  # number of UE
 M = 64  # number of subcarrier
 distances = np.random.rand(N) * 0.2  # cell radius is 200 meter
 noisevar = 1e-11  # noise variance
 J = 9  # number of slots
-pa = 0.1  # activation ratio
+pa = 0.05  # activation ratio
 tp = 20  # transmit power in dBm
 codebook = 'sparse'  # choice of codebook
 
@@ -32,6 +32,9 @@ else:
 vecnorm = 1 / np.linalg.norm(phi, 2, axis=0)
 phi = np.dot(phi, np.diag(vecnorm))  # normalizing each sequence to unit norm vectors
 
+# saving the codebook
+with open('codebook_' + str(M) + '.npy', 'wb') as file:
+    np.save(file, phi)
 
 # Generate training samples
 def gensample(N, M, J, phi, noisevar):
