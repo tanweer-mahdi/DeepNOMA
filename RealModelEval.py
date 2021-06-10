@@ -4,10 +4,12 @@ import numpy as np
 from torch.utils.data import Dataset, DataLoader
 import pdb
 import torch.nn.functional as F
-
+# number of ensemble
+ensembles = 1
 # loading data
-training = 'real_training_set_1.npy'
-labels = 'real_labels_1.npy'
+M = 64
+training = 'training_set_' + str(M) + '_' + '0.npy'
+labels = 'labels_' + str(M) + '_' + '0.npy'
 # exploring data
 train_exp = np.load(training, mmap_mode= 'r')
 labels_exp = np.load(labels, mmap_mode = 'r')
@@ -18,7 +20,7 @@ print("Number of Training Samples:", train_exp.shape[1])
 print("Number of labels:", num_labels)
 # define the network structure in a dictionary
 il = input_features
-hl = int(input_features*0.95)
+hl = int(input_features*1)
 structure = {
     'input_layer' : [il , hl],
     'hidden_1' : [hl, hl],
@@ -73,14 +75,15 @@ class DeepNOMA(nn.Module):
 
 
 # creating models
-ensembles = 2
+
 models = []
 for i in range(ensembles):
     models.append(DeepNOMA(structure))
 
 # loading model parameters
 for i in range(ensembles):
-    name = 'rmodel_'+ str(i) + '.pth'
+    #name = 'rmodel_' + str(M) + '_' + str(i) + '.pth'
+    name = 'rmodel_64_0.pth'
     load_path = name
     models[i].load_state_dict(torch.load(load_path))
     models[i].eval()
@@ -88,8 +91,10 @@ for i in range(ensembles):
 
 
 # loading dev set
-dev_data = np.load('real_dev_data.npy')
-dev_label = np.load('real_dev_labels.npy')
+dev_data_name = 'dev_data_' + str(M) + '.npy'
+dev_labels_name = 'dev_labels_' + str(M) + '.npy'
+dev_data = np.load(dev_data_name)
+dev_label = np.load(dev_labels_name)
 
 # # create a dataset
 class dev_dataset(Dataset):
@@ -103,7 +108,7 @@ class dev_dataset(Dataset):
     def __getitem__(self, idx):
         return self.dev_data[:, idx], self.dev_labels[:, idx]
 
-batch = 3
+batch = 4
 dev_dataset = dev_dataset(dev_data, dev_label)
 dev_dataloader = DataLoader(dataset= dev_dataset, batch_size= batch)
 total_error = 0
@@ -124,7 +129,7 @@ for i in dev_dataloader:
 
 # calculating activity error rate
 total_RA = dev_data.shape[1]
-aer = total_error / (total_RA*3)
+aer = total_error / (total_RA*batch)
 print("Total Activity Error:", aer)
 
 #################################### Independent Model Check ########################################
